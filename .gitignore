@@ -6,6 +6,9 @@ npm-debug.log
 # Node
 node_modules
 
+# Webpack
+.webpack
+
 #OS STUFF
 .DS_Store
 .tmp
