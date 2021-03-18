@@ -1,0 +1,17 @@
+# Logs
+logs
+*.log
+npm-debug.log
+
+# Node
+node_modules
+
+#OS STUFF
+.DS_Store
+.tmp
+
+#SERVERLESS STUFF
+admin.env
+.env
+_meta
+.serverless
