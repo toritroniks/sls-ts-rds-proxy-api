@@ -9,12 +9,15 @@ node_modules
 # Webpack
 .webpack
 
-#OS STUFF
+# OS STUFF
 .DS_Store
 .tmp
 
-#SERVERLESS STUFF
+# SERVERLESS STUFF
 admin.env
 .env
 _meta
 .serverless
+
+# Local STUFF
+local_db/db_data

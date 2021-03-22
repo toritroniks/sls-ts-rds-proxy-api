@@ -1,6 +1,7 @@
 import type { AWS } from '@serverless/typescript';
 
 import hello from '@functions/hello';
+import dbTest from '@functions/db-test';
 
 const serverlessConfiguration: AWS = {
   service: 'sls-rest-api',
@@ -11,10 +12,7 @@ const serverlessConfiguration: AWS = {
       includeModules: true,
     },
   },
-  plugins: [
-    'serverless-webpack',
-    'serverless-offline'
-  ],
+  plugins: ['serverless-webpack', 'serverless-offline'],
   provider: {
     name: 'aws',
     runtime: 'nodejs12.x',
@@ -24,11 +22,12 @@ const serverlessConfiguration: AWS = {
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+      ENV: '${opt:stage, "local"}',
     },
     lambdaHashingVersion: '20201221',
   },
   // import the function via paths
-  functions: { hello },
+  functions: { hello, dbTest },
 };
 
 module.exports = serverlessConfiguration;

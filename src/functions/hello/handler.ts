@@ -1,16 +1,14 @@
 import 'source-map-support/register';
 
-import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/apiGateway';
-import { formatJSONResponse } from '@libs/apiGateway';
-import { middyfy } from '@libs/lambda';
+import { jsonRes, baseHandler, ApiHandler } from '@libs/helpers/ApiHelper';
 
 import schema from './schema';
 
-const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
-  return formatJSONResponse({
+const hello: ApiHandler<typeof schema> = (event) => {
+  return jsonRes({
     message: `Hello ${event.body.name}, welcome to the exciting Serverless world!`,
     event,
   });
 }
 
-export const main = middyfy(hello);
+export const main = baseHandler(hello);
