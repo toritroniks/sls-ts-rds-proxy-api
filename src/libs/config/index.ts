@@ -3,11 +3,12 @@ import configDEV from './configDEV';
 import configPRD from './configPRD';
 
 export interface Config {
-  vpc?: VPC;
-  RDSProxyUserResource?: string;
+  vpc: VPC;
+  RDSProxyUserResource: string;
   dbEndpoint: string;
   dbPort: number;
   dbUser: string;
+  dbPassword?: string;
   dbTimezone: string;
   database: string;
 }
@@ -31,3 +32,9 @@ switch (process.env.ENV) {
 }
 
 export default config;
+
+export const allConfigs = {
+  local: configLOCAL,
+  dev: configDEV,
+  prd: configPRD,
+};

@@ -1,14 +1,16 @@
 import 'source-map-support/register';
 
-import { jsonRes, baseHandler, ApiHandler } from '@libs/helpers/ApiHelper';
+import { baseHandler, ApiHandler } from '@libs/helpers/apiHelper';
+import { reqSchema, resSchema, ReqInterface, ResInterface } from './schema';
 
-import schema from './schema';
-
-const hello: ApiHandler<typeof schema> = (event) => {
-  return jsonRes({
+const handler: ApiHandler<ReqInterface, ResInterface> = async event => {
+  return {
     message: `Hello ${event.body.name}, welcome to the exciting Serverless world!`,
     event,
-  });
-}
+  };
+};
 
-export const main = baseHandler(hello);
+export const main = baseHandler(handler, {
+  reqSchema,
+  resSchema,
+});

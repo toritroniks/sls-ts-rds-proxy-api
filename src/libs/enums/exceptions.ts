@@ -1,9 +1,9 @@
-import { ApiResponse } from "@libs/helpers/ApiHelper";
+import { ApiResponse } from '@libs/helpers/apiHelper';
 
 export class ApiError extends Error {
   readonly code: string;
   readonly status: number;
-  readonly details?: unknown;
+  details?: unknown;
 
   constructor(code: string, status: number, details?: unknown, message?: string) {
     super(message);
@@ -21,15 +21,30 @@ export class ApiError extends Error {
   public getResponse(): ApiResponse {
     return {
       statusCode: this.status,
-      body: JSON.stringify({
+      body: {
         error: {
           code: this.code,
           details: this.details ?? undefined,
         },
-      }),
+      },
     };
   }
 }
+
+export const errorSchema = {
+  type: 'object',
+  properties: {
+    error: {
+      type: 'object',
+      properties: {
+        code: { type: 'string' },
+        details: {},
+      },
+      required: ['code'],
+    },
+  },
+  required: ['error'],
+} as const;
 
 const exceptions = Object.freeze({
   param: {

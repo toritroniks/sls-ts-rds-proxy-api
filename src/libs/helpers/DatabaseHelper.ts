@@ -8,7 +8,7 @@ import config from '@libs/config';
 import exceptions from '@libs/enums/exceptions';
 
 const signer = new RDS.Signer({
-  region: process.env['REGION'],
+  region: process.env.REGION,
   hostname: config.dbEndpoint,
   port: config.dbPort,
   username: config.dbUser,
@@ -37,8 +37,8 @@ export async function createConnection(): Promise<Connection> {
 export async function execute(
   connection: Connection,
   query: string,
-  params?: unknown[]
-): Promise<unknown[]> {
+  params?: QueryParam[]
+): Promise<any[][]> {
   try {
     console.info('クエリー実行:', query);
     console.debug('パラメータ:', params);
@@ -50,12 +50,15 @@ export async function execute(
   }
 }
 
+export type QueryParam = number | string | boolean;
+
 function getDBLocalConnectionConfig() {
   const connectionConfig: ConnectionOptions = {
     host: config.dbEndpoint,
     user: config.dbUser,
     port: config.dbPort,
     database: config.database,
+    password: config.dbPassword,
     ssl: { rejectUnauthorized: false },
     timezone: config.dbTimezone,
   };
