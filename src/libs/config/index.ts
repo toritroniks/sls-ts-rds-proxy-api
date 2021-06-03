@@ -14,8 +14,9 @@ export interface Config {
 }
 
 export interface VPC {
-  securityGroupIds: string[];
-  subnetIds: string[];
+  securityGroupIds?: string[];
+  subnetIds?: string[];
+  [k: string]: unknown;
 }
 
 let config!: Config;
