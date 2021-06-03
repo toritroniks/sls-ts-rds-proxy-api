@@ -1,6 +1,6 @@
 import { getAPIBaseInfo } from '@libs/helpers/lambdaHelper';
 
-const { handlerDir, path } = getAPIBaseInfo(__dirname);
+const { handlerDir, path, cors } = getAPIBaseInfo(__dirname);
 
 export default {
   handler: `${handlerDir}/handler.main`,
@@ -9,6 +9,7 @@ export default {
       http: {
         method: 'post',
         path: path,
+        cors: cors,
       },
     },
   ],

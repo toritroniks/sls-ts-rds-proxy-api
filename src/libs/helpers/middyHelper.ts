@@ -3,17 +3,21 @@ import exceptions, { ApiError, errorSchema } from '@libs/enums/exceptions';
 import middy from '@middy/core';
 import middyJsonBodyParser from '@middy/http-json-body-parser';
 import middyValidator from '@middy/validator';
-import { Context } from 'aws-lambda';
 
 export function middify(handler: any, reqSchema: any, resSchema: any) {
   return middy(handler)
     .use(errorHandler)
+    .use(cors)
+    .use(eventLogger)
     .use(middyJsonBodyParser())
     .use(responseSerializer)
     .use(
       middyValidator({
         inputSchema: buildInputSchema(reqSchema),
         outputSchema: buildOutputSchema(resSchema),
+        ajvOptions: {
+          coerceTypes: false,
+        },
       })
     );
 }
@@ -38,22 +42,21 @@ function buildOutputSchema(resSchema: any) {
   };
 }
 
-const responseSerializer: middy.MiddlewareObject<any, any, Context> = {
+const responseSerializer: middy.MiddlewareObj = {
   after: serializeResponseBody,
   onError: serializeResponseBody,
 };
 
-function serializeResponseBody(handler: any, next: any) {
+function serializeResponseBody(handler: any) {
   handler.response.body = JSON.stringify(handler.response.body);
-  next();
 }
 
-const errorHandler: middy.MiddlewareObject<any, any, Context> = {
-  onError: (handler, next) => {
+const errorHandler: middy.MiddlewareObj = {
+  onError: handler => {
     const error = handler.error as Error & { statusCode?: number; details: unknown };
     if (error instanceof ApiError) {
       handler.response = error.getResponse();
-    } else if (error.statusCode === 400) {
+    } else if (error.statusCode === 400 && error.details) {
       const valError = exceptions.param.validationError;
       valError.details = error.details;
       handler.response = valError.getResponse();
@@ -61,6 +64,34 @@ const errorHandler: middy.MiddlewareObject<any, any, Context> = {
       console.error(error);
       handler.response = exceptions.server.internalError.getResponse();
     }
-    next();
+  },
+};
+
+const eventLogger: middy.MiddlewareObj = {
+  before: handler => {
+    console.info(`API処理開始:${handler.event.path}`);
+    console.debug(JSON.stringify(handler.event, null, 2));
+  },
+  after: handler => {
+    console.debug(JSON.stringify(handler.response, null, 2));
+    console.info(`API処理終了:${handler.event.path}`);
+  },
+  onError: handler => {
+    console.debug(JSON.stringify(handler.response, null, 2));
+    console.info(`API処理終了:${handler.event.path}`);
+  },
+};
+
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': '*',
+};
+
+const cors: middy.MiddlewareObj = {
+  after: handler => {
+    handler.response.headers = CORS_HEADERS;
+  },
+  onError: handler => {
+    handler.response.headers = CORS_HEADERS;
   },
 };

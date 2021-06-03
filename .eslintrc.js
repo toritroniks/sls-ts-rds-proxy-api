@@ -1,5 +1,3 @@
-const { off } = require('node:process');
-
 module.exports = {
   root: true,
   env: {
@@ -13,8 +11,7 @@ module.exports = {
     '@typescript-eslint/no-empty-interface': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-i': 'off',
-    '@typescript-eslint/no-use-before-define': ['error', { functions: false, classes: false }],
-    '@typescript-eslint/explicit-module-boundary-types': off,
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
     'require-await': 'warn',
     'default-case': 'error',
     'max-lines-per-function': ['warn', { max: 30, skipBlankLines: true, skipComments: true }],

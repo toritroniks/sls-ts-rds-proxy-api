@@ -2,11 +2,14 @@
 import type { AWS } from '@serverless/typescript';
 
 import functions from './apiFunctions';
-import { allConfigs } from '@libs/config';
+import { allConfigs, VPC } from '@libs/config';
 
 const serverlessConfiguration: AWS = {
   service: 'sls-ts-rds-proxy',
   frameworkVersion: '2',
+  package: {
+    individually: true,
+  },
   custom: {
     stage: '${opt:stage, "local"}',
     region: 'ap-northeast-1',
@@ -15,7 +18,9 @@ const serverlessConfiguration: AWS = {
     },
     webpack: {
       webpackConfig: './webpack.config.js',
-      includeModules: true,
+      includeModules: {
+        forceExclude: 'aws-sdk',
+      },
     },
     config: allConfigs,
   },
@@ -34,7 +39,7 @@ const serverlessConfiguration: AWS = {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
     },
-    vpc: '${self:custom.config.${self:custom.stage}.vpc}' as any,
+    vpc: '${self:custom.config.${self:custom.stage}.vpc}' as unknown as VPC,
     region: '${self:custom.region}' as any,
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
