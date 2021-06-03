@@ -13,7 +13,7 @@ export interface Config {
   database: string;
 }
 
-interface VPC {
+export interface VPC {
   securityGroupIds: string[];
   subnetIds: string[];
 }
