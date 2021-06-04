@@ -1,7 +1,9 @@
+import { SLSFunctions } from '@libs/helpers/serverlessHelper';
+
 import hello from '@functions/hello';
 import dbTest from '@functions/db-test';
 
-const functions = {
+const functions: SLSFunctions = {
   hello,
   dbTest,
 };

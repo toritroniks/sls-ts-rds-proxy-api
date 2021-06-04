@@ -13,9 +13,10 @@ export interface Config {
   database: string;
 }
 
-interface VPC {
-  securityGroupIds: string[];
-  subnetIds: string[];
+export interface VPC {
+  securityGroupIds?: string[];
+  subnetIds?: string[];
+  [k: string]: unknown;
 }
 
 let config!: Config;

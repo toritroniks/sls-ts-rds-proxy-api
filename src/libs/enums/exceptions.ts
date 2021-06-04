@@ -18,6 +18,11 @@ export class ApiError extends Error {
     this.message = code;
   }
 
+  public withDetails(details: unknown) {
+    this.details = details;
+    return this;
+  }
+
   public getResponse(): ApiResponse {
     return {
       statusCode: this.status,

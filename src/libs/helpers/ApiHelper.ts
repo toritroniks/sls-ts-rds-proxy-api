@@ -1,28 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { APIGatewayProxyEvent, APIGatewayProxyResult, Handler, Context } from 'aws-lambda';
-import { Connection } from 'mysql2/promise';
-import { createConnection } from './databaseHelper';
+import { Connection, createConnection } from './databaseHelper';
 import { middify } from './middyHelper';
 
 export const baseHandler = (handler: ApiHandler<any, any>, apiOptions: ApiOptions) => {
   const middyHandler = async (event: ParsedProxyEvent<any>, context: Context) => {
-    console.debug(`EVENT: ${JSON.stringify(event, null, 2)}`);
     let connection: Connection | undefined;
     try {
-      const connection = await createConnection();
+      connection = await createConnection();
       return jsonRes(await handler(event, connection, context));
     } finally {
-      if (connection) connection.end();
-      console.info('API処理終了:', event.path);
+      if (connection) await connection.end();
     }
   };
   return middify(middyHandler, apiOptions.reqSchema, apiOptions.resSchema);
 };
 
-export const jsonRes = (response: Record<string, unknown>): ApiResponse => {
+export const jsonRes = (response?: Record<string, unknown>): ApiResponse => {
   return {
     statusCode: 200,
-    body: response,
+    body: response ?? 'OK',
   };
 };
 

@@ -1,7 +1,7 @@
 import { RDS } from 'aws-sdk';
 import {
   createConnection as mysql2CreateConnection,
-  Connection,
+  Connection as Mysql2Connection,
   ConnectionOptions,
 } from 'mysql2/promise';
 import config from '@libs/config';
@@ -13,6 +13,35 @@ const signer = new RDS.Signer({
   port: config.dbPort,
   username: config.dbUser,
 });
+
+export class Connection {
+  private connection: Mysql2Connection;
+
+  constructor(connection: Mysql2Connection) {
+    this.connection = connection;
+  }
+
+  get instance() {
+    return this.connection;
+  }
+
+  async execute<T = any>(query: string, params?: QueryParam[]): Promise<T[][]> {
+    try {
+      console.info('クエリー実行:', query);
+      console.debug('パラメータ:', params);
+      return (await this.connection.execute(query, params ?? [])) as unknown as T[][];
+    } catch (err) {
+      console.error('クエリー実行に失敗しました。');
+      console.error(err);
+      throw exceptions.server.internalError;
+    }
+  }
+
+  async end() {
+    await this.connection.end();
+    console.info('コネクション終了');
+  }
+}
 
 export async function createConnection(): Promise<Connection> {
   console.info('DBコネクションを作成します。');
@@ -26,25 +55,9 @@ export async function createConnection(): Promise<Connection> {
 
     const connection = await mysql2CreateConnection(connectionConfig);
     console.info(`DBの接続id: ${connection.threadId}`);
-    return connection;
+    return new Connection(connection);
   } catch (err) {
     console.error('DBに接続できませんでした。');
-    console.error(err);
-    throw exceptions.server.internalError;
-  }
-}
-
-export async function execute(
-  connection: Connection,
-  query: string,
-  params?: QueryParam[]
-): Promise<any[][]> {
-  try {
-    console.info('クエリー実行:', query);
-    console.debug('パラメータ:', params);
-    return await connection.execute(query, params ?? []);
-  } catch (err) {
-    console.error('クエリー実行に失敗しました。');
     console.error(err);
     throw exceptions.server.internalError;
   }
@@ -59,7 +72,6 @@ function getDBLocalConnectionConfig() {
     port: config.dbPort,
     database: config.database,
     password: config.dbPassword,
-    ssl: { rejectUnauthorized: false },
     timezone: config.dbTimezone,
   };
   return connectionConfig;

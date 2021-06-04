@@ -1,12 +1,11 @@
 import 'source-map-support/register';
 
-import { execute } from '@libs/helpers/databaseHelper';
 import { baseHandler, ApiHandler } from '@libs/helpers/apiHelper';
 import { reqSchema, resSchema, ReqInterface, ResInterface } from './schema';
 
 const handler: ApiHandler<ReqInterface, ResInterface> = async (_event, connection) => {
   const query = 'show tables';
-  const [tables] = await execute(connection, query);
+  const [tables] = await connection.execute(query);
   return { tables };
 };
 
