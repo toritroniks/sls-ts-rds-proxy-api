@@ -1,6 +1,6 @@
 import 'source-map-support/register';
 
-import { execute } from '@libs/helpers/DatabaseHelper';
+import { execute } from '@libs/helpers/databaseHelper';
 import { baseHandler, ApiHandler } from '@libs/helpers/apiHelper';
 import { reqSchema, resSchema, ReqInterface, ResInterface } from './schema';
 
